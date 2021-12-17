@@ -1,0 +1,629 @@
+I"<h1 id="project-team-id--ptid-cds-jul21-1171-members---diana-hema-pavithra-and-sophiya">Project Team ID = PTID-CDS-JUL21-1171 (Members - Diana, Hema, Pavithra and Sophiya)</h1>
+<h1 id="project-id--prcp-1001-riceleaf-rice-leaf-disease-using-cnn">Project ID = PRCP-1001-RiceLeaf (Rice Leaf Disease using CNN)</h1>
+<hr />
+
+<h2 id="-preliminary--identify-the-business-case-">—————————– Preliminary → Identify The Business Case —————————–</h2>
+
+<p><img src="/img/posts/final-combination-(updated)/rice2.png" alt="png" />
+<a href="https://shorturl.at/nuO67">Image Credit</a> <br /></p>
+<blockquote>
+  <ul>
+    <li><strong>Dataset Description:</strong> The dataset contains images of rice leaf. The images are grouped into 3 classes based on the type of disease (a.k.a Bacterial leaf blight, Brown spot, and Leaf smut). There are 40 images in each class. The format of all images are jpg. <br /></li>
+    <li><strong>Industry Field:</strong> Agri/Forest. <br /></li>
+    <li><strong>Decision:</strong> Because we are dealing with images classification case, the most felicitous method to solve this case is by applying <u>neural network.</u></li>
+  </ul>
+</blockquote>
+
+<p><img src="/img/posts/final-combination-(updated)/1 Project Roadmap.png" alt="png" /></p>
+
+<hr />
+
+<p><img src="attachment:Phase%201.png" alt="Phase%201.png" /></p>
+
+<h3 id="--import-libraries">-) Import Libraries</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing.image</span> <span class="kn">import</span> <span class="n">ImageDataGenerator</span><span class="p">,</span> <span class="n">array_to_img</span><span class="p">,</span> <span class="n">img_to_array</span><span class="p">,</span> <span class="n">load_img</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.preprocessing.image</span> <span class="kn">import</span> <span class="n">ImageDataGenerator</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">layers</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.preprocessing</span> <span class="kn">import</span> <span class="n">image</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">layers</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">mplcyberpunk</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#setting some arguments &gt; pre-requisite
+</span><span class="n">img_sz</span> <span class="o">=</span> <span class="mi">224</span>
+<span class="n">btc_sz</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">channels</span> <span class="o">=</span> <span class="mi">3</span>
+</code></pre></div></div>
+
+<h3 id="--loading-image-dataset-from-directory">-) Loading Image Dataset from Directory</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">image_dataset_from_directory</span><span class="p">(</span>
+    <span class="s">"images"</span><span class="p">,</span>
+    <span class="n">shuffle</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">image_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">btc_sz</span>
+<span class="p">)</span>
+<span class="n">class_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">class_names</span>
+<span class="n">class_names</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Found 119 files belonging to 3 classes.
+
+
+
+
+
+['Bacterial leaf blight', 'Brown spot', 'Leaf smut']
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> We know that 119 images (with proportion 40:40:39) for 3 classes are very less to the size that is required to train and build sophisticated models. This can indicate several consequences such as: <code class="language-plaintext highlighter-rouge">very low accuracy, higher probabilities of overfitting, higher probabilities of misclassification.</code> <br /><br />
+<strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> So before move forward into the modeling phase, there are several stages hence that the modeling for prediction can run smoothly as expected. The details are below as follows ↓
+___</p>
+
+<p><img src="attachment:Phase%202.png" alt="Phase%202.png" /></p>
+<h3 id="--create-data-augmentation-strategy">-) Create Data Augmentation Strategy</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#setting the augmented images into the associated folders
+</span><span class="n">blb_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="s">'Bacterial leaf blight'</span><span class="p">)</span>  <span class="c1"># directory with our class pictures
+</span><span class="n">bs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="s">'Brown spot'</span><span class="p">)</span>
+<span class="n">ls_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s">'images'</span><span class="p">,</span> <span class="s">'Leaf smut'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#create data augmentation
+</span><span class="n">datagen</span> <span class="o">=</span> <span class="n">ImageDataGenerator</span><span class="p">(</span><span class="n">rotation_range</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> 
+                         <span class="n">width_shift_range</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> 
+                         <span class="n">height_shift_range</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>  
+                         <span class="n">shear_range</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> 
+                         <span class="n">zoom_range</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> 
+                         <span class="n">horizontal_flip</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> 
+                         <span class="n">fill_mode</span> <span class="o">=</span> <span class="s">'nearest'</span><span class="p">,</span> 
+                         <span class="n">data_format</span><span class="o">=</span><span class="s">'channels_last'</span><span class="p">,</span> 
+                         <span class="n">brightness_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#augmenting data for the bacterial leaf blight and storing it into the respective sub-folder
+</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datagen</span><span class="p">.</span><span class="n">flow_from_directory</span><span class="p">(</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="s">'images'</span><span class="p">,</span> <span class="c1">#the directory name
+</span>    <span class="n">classes</span> <span class="o">=</span>  <span class="p">[</span><span class="s">'Bacterial leaf blight'</span><span class="p">],</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">btc_sz</span><span class="p">,</span>  
+    <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">color_mode</span> <span class="o">=</span> <span class="s">'rgb'</span><span class="p">,</span> 
+    <span class="n">save_to_dir</span> <span class="o">=</span> <span class="s">'aug/blb_dir'</span><span class="p">,</span> 
+    <span class="n">save_prefix</span> <span class="o">=</span> <span class="s">'aug'</span><span class="p">,</span> 
+    <span class="n">save_format</span><span class="o">=</span><span class="s">'jpg'</span><span class="p">):</span>
+    
+  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">40</span><span class="p">:</span>
+    <span class="k">break</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Found 40 images belonging to 1 classes.
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#augmenting data for the Brown_spot and storing it into the respective sub-folder
+</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datagen</span><span class="p">.</span><span class="n">flow_from_directory</span><span class="p">(</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="s">'images'</span><span class="p">,</span> <span class="c1">#the directory name
+</span>    <span class="n">classes</span> <span class="o">=</span>  <span class="p">[</span><span class="s">'Brown spot'</span><span class="p">],</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">btc_sz</span><span class="p">,</span>  
+    <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">color_mode</span> <span class="o">=</span> <span class="s">'rgb'</span><span class="p">,</span> 
+    <span class="n">save_to_dir</span> <span class="o">=</span> <span class="s">'aug/bs_dir'</span><span class="p">,</span> 
+    <span class="n">save_prefix</span> <span class="o">=</span> <span class="s">'aug'</span><span class="p">,</span> 
+    <span class="n">save_format</span><span class="o">=</span><span class="s">'jpg'</span><span class="p">):</span>
+    
+  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">40</span><span class="p">:</span>
+    <span class="k">break</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Found 40 images belonging to 1 classes.
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#augmenting data for leaf smut and storing it into the respective sub-folder
+</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">datagen</span><span class="p">.</span><span class="n">flow_from_directory</span><span class="p">(</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="s">'images'</span><span class="p">,</span> <span class="c1">#the directory name
+</span>    <span class="n">classes</span> <span class="o">=</span>  <span class="p">[</span><span class="s">'Leaf smut'</span><span class="p">],</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">btc_sz</span><span class="p">,</span>  
+    <span class="n">target_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">color_mode</span> <span class="o">=</span> <span class="s">'rgb'</span><span class="p">,</span> 
+    <span class="n">save_to_dir</span> <span class="o">=</span> <span class="s">'aug/ls_dir'</span><span class="p">,</span> 
+    <span class="n">save_prefix</span> <span class="o">=</span> <span class="s">'aug'</span><span class="p">,</span> 
+    <span class="n">save_format</span><span class="o">=</span><span class="s">'jpg'</span><span class="p">):</span>
+    
+  <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">40</span><span class="p">:</span>
+    <span class="k">break</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Found 39 images belonging to 1 classes.
+</code></pre></div></div>
+
+<h3 id="--loading-augmented-image">-) Loading Augmented Image</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># import the entire augmented dataset from directory
+</span><span class="n">augmented_set</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">image_dataset_from_directory</span><span class="p">(</span>
+    <span class="s">'aug'</span><span class="p">,</span>
+    <span class="n">shuffle</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="n">image_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">btc_sz</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Found 2476 files belonging to 3 classes.
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Summary:</code></strong> Augmented data from 119 images to 2476, which should be enough for classification problem, overdoing the image augmentation will overfit the model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">len</span><span class="p">(</span><span class="n">augmented_set</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>78
+</code></pre></div></div>
+
+<h3 id="--splitting-the-data--using-tensorflow-input-pipeline">-) Splitting The Data → Using Tensorflow Input Pipeline</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#create function to splitting the data
+</span><span class="k">def</span> <span class="nf">get_dataset_partitions_tf</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">train_split</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">val_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">test_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shuffle</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">shuffle_size</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">):</span>
+    
+    <span class="n">ds_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffle_size</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+    
+    <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_split</span> <span class="o">*</span> <span class="n">ds_size</span><span class="p">)</span>
+    <span class="n">val_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_split</span> <span class="o">*</span> <span class="n">ds_size</span><span class="p">)</span>
+    
+    <span class="n">train_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="n">train_size</span><span class="p">)</span>
+    
+    <span class="n">val_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">skip</span><span class="p">(</span><span class="n">train_size</span><span class="p">).</span><span class="n">take</span><span class="p">(</span><span class="n">val_size</span><span class="p">)</span>
+    <span class="n">test_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">skip</span><span class="p">(</span><span class="n">train_size</span><span class="p">).</span><span class="n">skip</span><span class="p">(</span><span class="n">val_size</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">train_ds</span><span class="p">,</span> <span class="n">val_ds</span><span class="p">,</span> <span class="n">test_ds</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_ds</span><span class="p">,</span> <span class="n">val_ds</span><span class="p">,</span> <span class="n">test_ds</span> <span class="o">=</span> <span class="n">get_dataset_partitions_tf</span><span class="p">(</span><span class="n">augmented_set</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_ds</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val_ds</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_ds</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>62
+7
+9
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> Every one batch involving 78 data (62 data for training, 7 for validation, and 9 for testing). Last batch = 32. So the total is 2476.</p>
+
+<h3 id="--prefetch--caching-the-image-dataset">-) Prefetch &amp; Caching The Image Dataset</h3>
+<ul>
+  <li><strong>Illustration</strong>
+<img src="attachment:prefetch%20&amp;%20cache.png" alt="prefetch%20&amp;%20cache.png" />
+    <blockquote>
+      <p>Source belong to: <a href="https://www.tensorflow.org/guide/data_performance#caching">Tensorflow Guide</a> <br /><br /></p>
+    </blockquote>
+  </li>
+  <li><strong><code class="language-plaintext highlighter-rouge">Conclusion:</code></strong> by applying prefetch and caching, it will improves the performance of the pipeline.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#caching &amp; prefetch (read image from the disk, &amp; for the next iteration when we need the same image it will keep that image in the memory) =&gt; it will improves the performance of the pipeline
+</span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">train_ds</span><span class="p">.</span><span class="n">cache</span><span class="p">().</span><span class="n">shuffle</span><span class="p">(</span><span class="mi">1000</span><span class="p">).</span><span class="n">prefetch</span><span class="p">(</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
+<span class="n">val_ds</span> <span class="o">=</span> <span class="n">val_ds</span><span class="p">.</span><span class="n">cache</span><span class="p">().</span><span class="n">shuffle</span><span class="p">(</span><span class="mi">1000</span><span class="p">).</span><span class="n">prefetch</span><span class="p">(</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
+<span class="n">test_ds</span> <span class="o">=</span> <span class="n">test_ds</span><span class="p">.</span><span class="n">cache</span><span class="p">().</span><span class="n">shuffle</span><span class="p">(</span><span class="mi">1000</span><span class="p">).</span><span class="n">prefetch</span><span class="p">(</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">AUTOTUNE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><img src="attachment:Phase%203.png" alt="Phase%203.png" /></p>
+<h3 id="--build-cnn-model-architecture">-) Build CNN Model Architecture</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">resize_and_rescale</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">experimental</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">Resizing</span><span class="p">(</span><span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">experimental</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">Rescaling</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
+<span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data_augmentation</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">experimental</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">RandomFlip</span><span class="p">(</span><span class="s">"horizontal_and_vertical"</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">experimental</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">RandomRotation</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,),</span>
+<span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">btc_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">,</span> <span class="n">img_sz</span><span class="p">,</span> <span class="n">channels</span><span class="p">)</span>
+<span class="n">n_classes</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">mymodel</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">resize_and_rescale</span><span class="p">,</span> <span class="c1">#the first layer
+</span>    <span class="n">data_augmentation</span><span class="p">,</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">MaxPooling2D</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Flatten</span><span class="p">(),</span> <span class="c1"># this converts our 3D feature maps to 1D feature vectors
+</span>    <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'softmax'</span><span class="p">),</span> <span class="c1">#softmax will normalize the probability of classes
+</span><span class="p">])</span>
+
+<span class="n">mymodel</span><span class="p">.</span><span class="n">build</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="--training-the-model">-) Training The Model</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">callback</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s">'loss'</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="c1"># This callback will stop the training when there is no improvement in the 'loss' for three consecutive epochs.
+</span><span class="n">modell</span> <span class="o">=</span> <span class="n">mymodel</span>
+<span class="n">modell</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="s">'adam'</span><span class="p">,</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">SparseCategoricalCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accuracy'</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">history5</span> <span class="o">=</span> <span class="n">modell</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">train_ds</span><span class="p">,</span> 
+    <span class="n">epochs</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">validation_data</span><span class="o">=</span><span class="n">val_ds</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callback</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">])</span>  <span class="c1">#
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Epoch 1/50
+62/62 [==============================] - 251s 3s/step - loss: 1.1023 - accuracy: 0.3304 - val_loss: 1.0989 - val_accuracy: 0.3393
+Epoch 2/50
+62/62 [==============================] - 215s 3s/step - loss: 1.0930 - accuracy: 0.3707 - val_loss: 1.1403 - val_accuracy: 0.3750
+Epoch 3/50
+62/62 [==============================] - 250s 4s/step - loss: 1.0703 - accuracy: 0.4129 - val_loss: 0.9850 - val_accuracy: 0.5179
+Epoch 4/50
+62/62 [==============================] - 272s 4s/step - loss: 0.9903 - accuracy: 0.5224 - val_loss: 0.9365 - val_accuracy: 0.5536
+Epoch 5/50
+62/62 [==============================] - 363s 6s/step - loss: 0.9505 - accuracy: 0.5692 - val_loss: 0.8994 - val_accuracy: 0.5357
+Epoch 6/50
+62/62 [==============================] - 343s 6s/step - loss: 0.9048 - accuracy: 0.5672 - val_loss: 0.8170 - val_accuracy: 0.6116
+Epoch 7/50
+62/62 [==============================] - 340s 5s/step - loss: 0.8948 - accuracy: 0.5626 - val_loss: 0.8195 - val_accuracy: 0.6116
+Epoch 8/50
+62/62 [==============================] - 341s 5s/step - loss: 0.8268 - accuracy: 0.6115 - val_loss: 0.7871 - val_accuracy: 0.6116
+Epoch 9/50
+62/62 [==============================] - 347s 6s/step - loss: 0.8171 - accuracy: 0.6064 - val_loss: 0.7686 - val_accuracy: 0.6696
+Epoch 10/50
+62/62 [==============================] - 285s 5s/step - loss: 0.8172 - accuracy: 0.6079 - val_loss: 0.6929 - val_accuracy: 0.6562
+Epoch 11/50
+62/62 [==============================] - 223s 4s/step - loss: 0.7283 - accuracy: 0.6609 - val_loss: 0.6760 - val_accuracy: 0.6964
+Epoch 12/50
+62/62 [==============================] - 216s 3s/step - loss: 0.6589 - accuracy: 0.6950 - val_loss: 0.5757 - val_accuracy: 0.7366
+Epoch 13/50
+62/62 [==============================] - 221s 4s/step - loss: 0.5760 - accuracy: 0.7546 - val_loss: 0.6767 - val_accuracy: 0.7098
+Epoch 14/50
+62/62 [==============================] - 216s 3s/step - loss: 0.5348 - accuracy: 0.7775 - val_loss: 0.4017 - val_accuracy: 0.8482
+Epoch 15/50
+62/62 [==============================] - 216s 3s/step - loss: 0.4547 - accuracy: 0.8192 - val_loss: 0.4389 - val_accuracy: 0.8348
+Epoch 16/50
+62/62 [==============================] - 211s 3s/step - loss: 0.4415 - accuracy: 0.8203 - val_loss: 0.3272 - val_accuracy: 0.8616
+Epoch 17/50
+62/62 [==============================] - 211s 3s/step - loss: 0.3718 - accuracy: 0.8467 - val_loss: 0.5266 - val_accuracy: 0.7679
+Epoch 18/50
+62/62 [==============================] - 201s 3s/step - loss: 0.3450 - accuracy: 0.8600 - val_loss: 0.2991 - val_accuracy: 0.8929
+Epoch 19/50
+62/62 [==============================] - 209s 3s/step - loss: 0.3234 - accuracy: 0.8676 - val_loss: 0.4110 - val_accuracy: 0.8214
+Epoch 20/50
+62/62 [==============================] - 210s 3s/step - loss: 0.3707 - accuracy: 0.8518 - val_loss: 0.4062 - val_accuracy: 0.8080
+Epoch 21/50
+62/62 [==============================] - 210s 3s/step - loss: 0.3276 - accuracy: 0.8702 - val_loss: 0.3121 - val_accuracy: 0.8661
+Epoch 22/50
+62/62 [==============================] - 208s 3s/step - loss: 0.2573 - accuracy: 0.8987 - val_loss: 0.3492 - val_accuracy: 0.8571
+Epoch 23/50
+62/62 [==============================] - 211s 3s/step - loss: 0.3557 - accuracy: 0.8473 - val_loss: 0.3633 - val_accuracy: 0.8795
+Epoch 24/50
+62/62 [==============================] - 212s 3s/step - loss: 0.3085 - accuracy: 0.8798 - val_loss: 0.2974 - val_accuracy: 0.8973
+Epoch 25/50
+62/62 [==============================] - 211s 3s/step - loss: 0.2695 - accuracy: 0.8926 - val_loss: 0.2842 - val_accuracy: 0.9018
+
+
+
+
+
+25
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> Even though we set epochs = 50, it will stop automatically at 25 epochs. The callback function plays a very important role in finding the optimum value of epochs in the model that has been created. <br />
+<strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> Print the summary of our model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#summary of cnn model architecture
+</span><span class="n">modell</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Model: "sequential_2"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+sequential (Sequential)      (None, 224, 224, 3)       0         
+_________________________________________________________________
+sequential_1 (Sequential)    (None, 224, 224, 3)       0         
+_________________________________________________________________
+conv2d (Conv2D)              (None, 222, 222, 32)      896       
+_________________________________________________________________
+max_pooling2d (MaxPooling2D) (None, 111, 111, 32)      0         
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 109, 109, 64)      18496     
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 54, 54, 64)        0         
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 52, 52, 64)        36928     
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 26, 26, 64)        0         
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 24, 24, 64)        36928     
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 12, 12, 64)        0         
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 10, 10, 64)        36928     
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 5, 5, 64)          0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 3, 3, 64)          36928     
+_________________________________________________________________
+max_pooling2d_5 (MaxPooling2 (None, 1, 1, 64)          0         
+_________________________________________________________________
+flatten (Flatten)            (None, 64)                0         
+_________________________________________________________________
+dense (Dense)                (None, 64)                4160      
+_________________________________________________________________
+dense_1 (Dense)              (None, 3)                 195       
+=================================================================
+Total params: 171,459
+Trainable params: 171,459
+Non-trainable params: 0
+_________________________________________________________________
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> Summary above shows us we’ve been successfully train our params, it runs smoothly. So the probability of success to dealing with prediction is higher, as we don’t have “non-trainable params”. <br />
+<strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> Move forward into evaluating the model.</p>
+
+<h3 id="--evaluate-the-model">-) Evaluate The Model</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'The parameters inside our model: '</span><span class="p">,</span> <span class="n">history5</span><span class="p">.</span><span class="n">params</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The keys inside our model: '</span><span class="p">,</span> <span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">.</span><span class="n">keys</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The parameters inside our model:  {'verbose': 1, 'epochs': 50, 'steps': 62}
+The keys inside our model:  dict_keys(['loss', 'accuracy', 'val_loss', 'val_accuracy'])
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scores</span> <span class="o">=</span> <span class="n">modell</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_ds</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>9/9 [==============================] - 33s 535ms/step - loss: 0.2622 - accuracy: 0.8924
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'Train accuracy: '</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="s">'%'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Test accuracy: '</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s">'%'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Train accuracy:  89.26 %
+Test accuracy:  89.24 %
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> Result above are not much different (still in the same range / 89%), that’s indicates our CNN model architecture is pretty much suitable to solve this case. <br /> <strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> To ascertain, let’s display a random image to test our prediction is suitable to solve this classification. It is shown as following below ↓</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#display a random image to test the prediction
+</span><span class="k">for</span> <span class="n">images_batch</span><span class="p">,</span> <span class="n">labels_batch</span> <span class="ow">in</span> <span class="n">test_ds</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+    
+    <span class="n">first_image</span> <span class="o">=</span> <span class="n">images_batch</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">numpy</span><span class="p">().</span><span class="n">astype</span><span class="p">(</span><span class="s">'uint8'</span><span class="p">)</span>
+    <span class="n">first_label</span> <span class="o">=</span> <span class="n">labels_batch</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">numpy</span><span class="p">()</span>
+    
+    <span class="k">print</span><span class="p">(</span><span class="s">'First image to predict'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">first_image</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Actual label:'</span><span class="p">,</span> <span class="n">class_names</span><span class="p">[</span><span class="n">first_label</span><span class="p">])</span>
+    
+    <span class="n">batch_prediction</span> <span class="o">=</span> <span class="n">mymodel</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">images_batch</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Predicted label:'</span><span class="p">,</span><span class="n">class_names</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">batch_prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>First image to predict
+Actual label: Bacterial leaf blight
+Predicted label: Bacterial leaf blight
+</code></pre></div></div>
+
+<p><img src="/img/posts/final-combination-(updated)/output_42_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#export model to a file on disk &gt;&gt; using auto increment
+</span><span class="n">mymodel_version</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">'./preview/mymodel'</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">mymodel</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s">"./preview/mymodel/</span><span class="si">{</span><span class="n">mymodel_version</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="n">mymodel</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">"CNN_RiceLeafDiseaseClassification.h5"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INFO:tensorflow:Assets written to: ./preview/mymodel/2\assets
+</code></pre></div></div>
+
+<hr />
+
+<p><img src="attachment:Phase%204.png" alt="Phase%204.png" /></p>
+<h3 id="--visualize-the-result">-) Visualize The Result</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Summary of the Accuracy scores for splitting dataset
+</span><span class="n">model_ev</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'Set'</span><span class="p">:</span> <span class="p">[</span><span class="s">'Train'</span><span class="p">,</span><span class="s">'Test'</span><span class="p">,</span><span class="s">'Validation'</span><span class="p">],</span> <span class="s">'Accuracy (%)'</span><span class="p">:</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="nb">round</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span><span class="nb">round</span><span class="p">(</span><span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_accuracy'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)]})</span>
+<span class="n">model_ev</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Set</th>
+      <th>Accuracy (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Train</td>
+      <td>89.26</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Test</td>
+      <td>89.24</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Validation</td>
+      <td>90.18</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sns</span><span class="p">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s">"darkgrid"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Accuracy Comparison"</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s">'bold'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">"[ Set ]"</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s">'bold'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">85.5</span><span class="p">,</span> <span class="mf">90.95</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">"[ Accuracy (%) ]"</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s">'bold'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"Set"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"Accuracy (%)"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">model_ev</span><span class="p">,</span>
+                 <span class="n">palette</span><span class="o">=</span><span class="s">"Blues_d"</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="p">.</span><span class="n">pointplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"Set"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"Accuracy (%)"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">model_ev</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'#bb3f3f'</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s">'--'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/final-combination-(updated)/output_47_0.png" alt="png" /></p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> That’s how it looks like, the differences in accuracy between the 3 of them (&lt; 1%/each) are not showing any warning sign to do further treatment. <br />
+<strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> Move forward to visualize the accuracy and loss for the training and validation set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">acc</span> <span class="o">=</span> <span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">]</span>
+<span class="n">val_acc</span> <span class="o">=</span> <span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_accuracy'</span><span class="p">]</span>
+
+<span class="n">loss</span> <span class="o">=</span> <span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">]</span>
+<span class="n">val_loss</span> <span class="o">=</span> <span class="n">history5</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">]</span>
+
+<span class="c1">#plotting training and validation (with respect to accuracy and loss)
+</span><span class="n">plt</span><span class="p">.</span><span class="n">style</span><span class="p">.</span><span class="n">use</span><span class="p">(</span><span class="s">'cyberpunk'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">acc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Training Accuracy'</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'o'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">val_acc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Validation Accuracy'</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'P'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'[ number of epochs ]'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'[ accuracy ]'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s">'lower right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Training &amp; Validation Accuracy'</span><span class="p">,</span> <span class="n">fontweight</span> <span class="o">=</span> <span class="s">'bold'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">mplcyberpunk</span><span class="p">.</span><span class="n">add_glow_effects</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Training Loss'</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'o'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Validation Loss'</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'P'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'[ number of epochs ]'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'[ loss ]'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s">'upper right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Training &amp; Validation Loss'</span><span class="p">,</span> <span class="n">fontweight</span> <span class="o">=</span> <span class="s">'bold'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">mplcyberpunk</span><span class="p">.</span><span class="n">add_glow_effects</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/final-combination-(updated)/output_49_0.png" alt="png" /></p>
+
+<p><strong><code class="language-plaintext highlighter-rouge">Interpretation:</code></strong> According to the graphs above, as the number of epochs is increasing, the CNN model accuracy that we build is also increasing (getting closer to 100%). That indicates our model performs better and it’s absolutely suitable to solve this case. Whereas, ‘loss’ is the result of a bad prediction. A ‘loss’ is a number indicating how bad the model’s prediction was. If the model’s prediction is perfect, the ‘loss’ is 0. On the right side, we can clearly see as the number of epochs are increasing, the more our ‘loss’ is much closer to 0. <br />
+<strong><code class="language-plaintext highlighter-rouge">Decision:</code></strong> Move forward to the final stage (Visualize The Prediction).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+    <span class="n">img_array</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">img_to_array</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">numpy</span><span class="p">())</span> <span class="c1">#convert image into array
+</span>    <span class="n">img_array</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">img_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">mymodel</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+    
+    <span class="n">predicted_class</span> <span class="o">=</span> <span class="n">class_names</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">predicted_class</span><span class="p">,</span> <span class="n">confidence</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Visualize the prediction
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s">'Display of Prediction Rice Leaf Disease Image'</span><span class="p">,</span> <span class="n">fontweight</span> <span class="o">=</span> <span class="s">'bold'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">test_ds</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">numpy</span><span class="p">().</span><span class="n">astype</span><span class="p">(</span><span class="s">'uint8'</span><span class="p">))</span>
+        
+        <span class="n">predicted_class</span><span class="p">,</span> <span class="n">confidence</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">modell</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">numpy</span><span class="p">())</span>
+        <span class="n">actual_class</span> <span class="o">=</span> <span class="n">class_names</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        
+        <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s">"Actual: </span><span class="si">{</span><span class="n">actual_class</span><span class="si">}</span><span class="s">, </span><span class="se">\n</span><span class="s"> Predicted: </span><span class="si">{</span><span class="n">predicted_class</span><span class="si">}</span><span class="s">.</span><span class="se">\n</span><span class="s"> Confidence: </span><span class="si">{</span><span class="n">confidence</span><span class="si">}</span><span class="s">%"</span><span class="p">)</span>
+        
+        <span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">"off"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/img/posts/final-combination-(updated)/output_52_0.png" alt="png" /></p>
+
+<h3 id="--project-risks">-) Project Risks</h3>
+
+<ol>
+  <li>We have used data augmentation technique to increase the size of the dataset from 119 to over 2476 images, which may have oversimplified and overfit the model to the same dataset and may not be a representative of the entire population images of these diseases.</li>
+  <li>The project assumes that the dataset used for modeling in this project is a representative of the population dataset else the models may not provide the accuracies that are shown here.</li>
+</ol>
+
+<h3 id="--reccomendations">-) Reccomendations</h3>
+
+<ol>
+  <li>CNN model above is a good modeling techinque for this project with good accuracy given the limited dataset.</li>
+  <li>Model can also be further improved with the hyperparameter tuning of the CNN architecture but since the accuracy is within the acceptable range we limit the scope and decided to stop further analysis.</li>
+</ol>
+
+<h2 id="additional-context--cnn-model-architecture-diagram"><em>Additional Context → CNN Model Architecture Diagram</em></h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s">"""&lt;a href="shorturl.at/suLS8"&gt;CNN Model Architecture Diagram&lt;/a&gt;"""</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">'CNN_RiceLeafDiseaseClassification.h5.png'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="shorturl.at/suLS8">CNN Model Architecture Diagram</a></p>
+
+<p><img src="/img/posts/final-combination-(updated)/output_58_1.png" alt="png" /></p>
+
+:ET
