@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Cellphone Price Prediction"
-subtitle: "Biggest scope &rarr; find out the relationship between the phone's features and the selling price. <br/> Target &rarr; predict the price range of the phone (not the actual price)."
+subtitle: "Predict the price range of the phone (not the actual price)."
 background: '/img/posts/cellphone/bg-cellphone.jpg'
 ---
 
